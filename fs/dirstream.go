@@ -46,12 +46,12 @@ func (a *dirArray) Close() {
 
 func (a *dirArray) Releasedir(ctx context.Context, releaseFlags uint32) {}
 
-func (a *dirArray) Readdirent(ctx context.Context) (de *fuse.DirEntry, errno syscall.Errno) {
+func (a *dirArray) Readdirent(ctx context.Context) (de HasDirEntry, errno syscall.Errno) {
 	if !a.HasNext() {
 		return nil, 0
 	}
 	e, errno := a.Next()
-	return &e, errno
+	return SimpleDirEntry{&e}, errno
 }
 
 // NewLoopbackDirStream opens a directory for reading as a DirStream
@@ -81,7 +81,7 @@ func (d *dirStreamAsFile) Releasedir(ctx context.Context, releaseFlags uint32) {
 	}
 }
 
-func (d *dirStreamAsFile) Readdirent(ctx context.Context) (de *fuse.DirEntry, errno syscall.Errno) {
+func (d *dirStreamAsFile) Readdirent(ctx context.Context) (de HasDirEntry, errno syscall.Errno) {
 	if d.ds == nil {
 		d.ds, errno = d.creator(ctx)
 		if errno != 0 {
@@ -93,7 +93,7 @@ func (d *dirStreamAsFile) Readdirent(ctx context.Context) (de *fuse.DirEntry, er
 	}
 
 	e, errno := d.ds.Next()
-	return &e, errno
+	return SimpleDirEntry{&e}, errno
 }
 
 func (d *dirStreamAsFile) Seekdir(ctx context.Context, off uint64) syscall.Errno {
@@ -179,12 +179,12 @@ func (ds *loopbackDirStream) HasNext() bool {
 
 var _ = (FileReaddirenter)((*loopbackDirStream)(nil))
 
-func (ds *loopbackDirStream) Readdirent(ctx context.Context) (*fuse.DirEntry, syscall.Errno) {
+func (ds *loopbackDirStream) Readdirent(ctx context.Context) (HasDirEntry, syscall.Errno) {
 	if !ds.HasNext() {
 		return nil, 0
 	}
 	de, errno := ds.Next()
-	return &de, errno
+	return SimpleDirEntry{&de}, errno
 }
 
 func (ds *loopbackDirStream) Next() (fuse.DirEntry, syscall.Errno) {
