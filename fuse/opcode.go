@@ -629,6 +629,7 @@ func init() {
 		_OP_INTERRUPT:       doInterrupt,
 		_OP_COPY_FILE_RANGE: doCopyFileRange,
 		_OP_LSEEK:           doLseek,
+		_OP_TMPFILE:         doCreate,
 	} {
 		operationHandlers[op].Func = v
 	}
@@ -638,6 +639,7 @@ func init() {
 		_OP_BMAP:                  _BmapOut{},
 		_OP_COPY_FILE_RANGE:       WriteOut{},
 		_OP_CREATE:                CreateOut{},
+		_OP_TMPFILE:               CreateOut{},
 		_OP_GETATTR:               AttrOut{},
 		_OP_GETLK:                 LkOut{},
 		_OP_GETXATTR:              GetXAttrOut{},
@@ -674,6 +676,7 @@ func init() {
 		_OP_BMAP:            _BmapIn{},
 		_OP_COPY_FILE_RANGE: CopyFileRangeIn{},
 		_OP_CREATE:          CreateIn{},
+		_OP_TMPFILE:         CreateIn{},
 		_OP_FALLOCATE:       FallocateIn{},
 		_OP_FLUSH:           FlushIn{},
 		_OP_FORGET:          ForgetIn{},
@@ -718,6 +721,7 @@ func init() {
 	// File name args.
 	for op, count := range map[uint32]int{
 		_OP_CREATE:      1,
+		_OP_TMPFILE:     1,
 		_OP_SETXATTR:    1,
 		_OP_GETXATTR:    1,
 		_OP_LINK:        1,
